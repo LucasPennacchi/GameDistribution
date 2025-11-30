@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>GameDistribution - Dashboard de Consultas</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 20px; background-color: #f4f4f9; }
+        header { background-color: #333; color: white; padding: 15px; text-align: center; margin-bottom: 20px; }
+        h2 { border-bottom: 2px solid #007bff; color: #007bff; padding-bottom: 5px; margin-top: 30px; }
+        table { width: 100%; border-collapse: collapse; margin-bottom: 30px; background-color: white; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        th, td { border: 1px solid #ddd; padding: 10px; text-align: left; }
+        th { background-color: #e9ecef; }
+        .filter-container { background-color: #fff; padding: 15px; border-radius: 8px; margin-bottom: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        .result-box { background-color: #e9f7ef; border: 1px solid #28a745; padding: 15px; border-radius: 5px; margin-top: 15px; }
+        .error-message { color: red; }
+    </style>
+</head>
+<body>
+<header>
+    <h1>🎮 GameDistribution API - Consultas (Etapa 4/5)</h1>
+</header>
+
+<div id="jogos-section">
+    <h2>🔥 Catálogo de Jogos & Consultas Agregadas</h2>
+    <div class="filter-container">
+        <label>Consulta de Catálogo:</label>
+        <select id="consulta-jogos" onchange="carregarJogos()">
+            <option value="todos">Listar Todos os Jogos (Padrão)</option>
+            <option value="mais_vendidos">Top 5 Jogos Mais Vendidos (Consulta Complexa)</option>
+        </select>
+
+        <label for="filtro-categoria" style="margin-left: 20px;">Filtrar por Gênero:</label>
+        <select id="filtro-categoria" onchange="carregarJogos()">
+        </select>
+    </div>
+    <table id="tabela-jogos">
+        <thead>
+        <tr>
+            <th>ID</th><th>Título</th><th>Preço</th><th>Lançamento</th><th>Editora</th><th>Gênero</th>
+        </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+</div>
+
+<div id="historico-section">
+    <h2>🧾 Histórico de Compras por Cliente (Consulta Complexa)</h2>
+    <div class="filter-container">
+        <label for="cliente-id-input">ID do Cliente (Ex: 1 a 10):</label>
+        <input type="number" id="cliente-id-input" value="1" min="1" max="10">
+        <button onclick="buscarHistorico()">Buscar Histórico</button>
+        <p id="historico-status" class="error-message"></p>
+    </div>
+    <div id="historico-resultado" style="margin-top: 15px;">
+        <table id="tabela-historico">
+            <thead>
+            <tr>
+                <th>ID Compra</th>
+                <th>Data</th>
+                <th>Jogo Comprado</th>
+                <th>Preço Pago</th>
+            </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+</div>
+
+<h2>👤 Clientes Cadastrados</h2>
+<table id="tabela-clientes"><thead><tr><th>ID</th><th>Nome</th><th>Email</th><th>Nascimento</th></tr></thead><tbody></tbody></table>
+
+<h2>📝 Editoras (Criadoras)</h2>
+<table id="tabela-editoras"><thead><tr><th>ID</th><th>Nome</th><th>Sede</th></tr></thead><tbody></tbody></table>
+
+<h2>📣 Publicadoras (Divulgadoras)</h2>
+<table id="tabela-publicadoras"><thead><tr><th>ID</th><th>Nome</th><th>Email</th></tr></thead><tbody></tbody></table>
+
+<script src="app.js"></script>
+</body>
+</html>
