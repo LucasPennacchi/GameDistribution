@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - GameDistribution</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <script>
+        
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                       
+                        'accent-blue': '#6366f1', 
+                        'deep-bg': '#0f172a', 
+                        'card-bg': '#1e293b', 
+                        'header-text': '#818cf8', 
+                        'accent-green': '#34d399', 
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+       
+        :root {
+            --bg-color: #0f172a; 
+            --text-color: #e2e8f0; 
+            --card-bg: #1e293b; 
+            --input-bg: #0f172a; 
+            --border-color: #334155; 
+        }
+        
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5); 
+        }
+
+        .input-field {
+            background-color: var(--input-bg);
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="card p-8 rounded-xl w-full max-w-sm">
+        <h1 class="text-3xl font-extrabold text-center mb-6" style="color: var(--header-text);">
+            GameDistribution
+        </h1>
+        <p class="text-center mb-8 text-sm" style="color: #94a3b8;">
+            Acesso ao Dashboard
+        </p>
+
+        <form id="login-form" onsubmit="handleLogin(event)" class="space-y-4">
+
+            <div>
+                <label for="username" class="block text-sm font-medium mb-1">Usuário / Email</label>
+                <input 
+                    type="text" 
+                    id="username" 
+                    name="username" 
+                    value="admin"
+                    required 
+                    class="input-field w-full p-3 rounded-lg focus:ring-accent-blue focus:border-accent-blue transition duration-150"
+                >
+            </div>
+
+            <div>
+                <label for="password" class="block text-sm font-medium mb-1">Senha</label>
+                <input 
+                    type="password" 
+                    id="password" 
+                    name="password" 
+                    value="123"
+                    required 
+                    class="input-field w-full p-3 rounded-lg focus:ring-accent-blue focus:border-accent-blue transition duration-150"
+                >
+            </div>
+            
+            <!-- Mensagem de Status/Erro -->
+            <p id="message" class="text-center text-sm font-medium min-h-6"></p>
+
+            <!-- Botão de Login -->
+            <button 
+                type="submit" 
+                id="login-button"
+                class="w-full bg-accent-blue hover:opacity-90 text-white font-bold py-3 px-4 rounded-lg shadow-lg transition duration-300 transform hover:scale-[1.01]"
+            >
+                Entrar
+            </button>
+            
+            <!-- Botão de Cadastro -->
+            <a 
+                href="cadastro.html" 
+                class="w-full block text-center mt-4 text-sm font-semibold py-2 rounded-lg text-accent-blue border border-accent-blue hover:bg-accent-blue hover:text-white transition duration-300"
+            >
+                Criar Conta (Cadastrar)
+            </a>
+        </form>
+        
+        <p class="text-center text-xs mt-6" style="color: #64748b;">
+            Use admin / 123 para demonstração.
+        </p>
+    </div>
+
+    <script>
+        /**
+         * Simula o processo de login.
+         */
+        function handleLogin(event) {
+            event.preventDefault(); 
+            
+            const usernameInput = document.getElementById('username').value;
+            const passwordInput = document.getElementById('password').value;
+            const messageElement = document.getElementById('message');
+            const loginButton = document.getElementById('login-button');
+            
+            // Limpa mensagens anteriores
+            messageElement.textContent = '';
+            messageElement.className = 'text-center text-sm font-medium min-h-6';
+            
+            // Simula um estado de carregamento
+            loginButton.textContent = 'Verificando...';
+            loginButton.disabled = true;
+
+            
+            setTimeout(() => {
+                
+                // Credenciais de demonstração: admin / 123
+                if (usernameInput === 'admin' && passwordInput === '123') {
+                    
+                    messageElement.textContent = 'Login bem-sucedido! Redirecionando...';
+                    messageElement.classList.add('text-accent-green'); 
+                    
+                    
+                   
+                    setTimeout(() => {
+                        window.location.href = 'index.html';
+                    }, 1000); // Dá um segundo para a mensagem de sucesso aparecer
+
+                } else {
+                    // Falha no Login
+                    messageElement.textContent = 'Credenciais inválidas. Tente novamente.';
+                    messageElement.classList.add('text-red-400'); // Cor vermelha
+                    
+                    // Restaura o botão
+                    loginButton.textContent = 'Entrar';
+                    loginButton.disabled = false;
+                }
+            }, 2000); 
+        }
+    </script>
+</body>
+</html>

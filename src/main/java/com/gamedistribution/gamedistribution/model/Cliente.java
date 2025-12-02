@@ -1,7 +1,9 @@
 package com.gamedistribution.gamedistribution.model;
 
 import jakarta.persistence.*;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -14,7 +16,9 @@ import java.util.Set;
  */
 @Entity
 @Table(name = "CLIENTE")
-@Data
+@Getter
+@Setter
+@ToString(callSuper = false)
 @NoArgsConstructor
 @AllArgsConstructor
 public class Cliente {

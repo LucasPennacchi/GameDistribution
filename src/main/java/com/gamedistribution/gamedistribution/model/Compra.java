@@ -1,9 +1,12 @@
 package com.gamedistribution.gamedistribution.model;
 
 import jakarta.persistence.*;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Set;
@@ -14,7 +17,9 @@ import java.util.Set;
  */
 @Entity
 @Table(name = "COMPRA")
-@Data
+@Getter
+@Setter
+@ToString(callSuper = false)
 @NoArgsConstructor
 @AllArgsConstructor
 public class Compra {
@@ -49,9 +54,8 @@ public class Compra {
 
     /**
      * Relacionamento 1:N com ItemCompra.
-     * Mapeado pelo campo 'compra' na classe ItemCompra.
-     * Usado para carregar todos os itens desta compra.
+     * @JsonIgnore impede o ciclo recursivo Compra -> ItemCompra -> Compra.
      */
     @OneToMany(mappedBy = "compra", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private Set<ItemCompra> itensDaCompra; // Nome que usaremos na JPQL
+    private Set<ItemCompra> itensDaCompra;
 }

@@ -112,4 +112,31 @@ public class JogoController {
         }
         return new ResponseEntity<>(topJogos, HttpStatus.OK);
     }
+
+    /**
+     * ENDPOINT DE CONSULTA UNIFICADA: Suporta filtragem por gênero e ordenação.
+     * Mapeia requisições GET para '/api/jogos/filtrar'.
+     * @param idGenero O ID do Gênero (opcional).
+     * @param ordenacao A string de ordenação (ex: precoAsc, lancamentoDesc).
+     * @return Lista de jogos filtrados e ordenados.
+     */
+    @GetMapping("/filtrar")
+    public ResponseEntity<List<Jogo>> buscarEOrdenarJogos(
+            @RequestParam(required = false) Long idGenero,
+            @RequestParam(defaultValue = "precoAsc") String ordenacao) {
+
+        // Se o frontend solicitar o filtro de "mais_vendidos", redirecione para o endpoint customizado
+        if (ordenacao.equals("mais_vendidos")) {
+            // Assumindo que você quer o Top 10
+            return ResponseEntity.ok(jogoService.buscarTopJogosMaisVendidos(10));
+        }
+
+        List<Jogo> jogos = jogoService.buscarEOrdenar(idGenero, ordenacao);
+
+        if (jogos.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+        }
+
+        return ResponseEntity.ok(jogos);
+    }
 }

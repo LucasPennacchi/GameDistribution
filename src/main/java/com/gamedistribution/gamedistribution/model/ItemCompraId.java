@@ -1,28 +1,37 @@
 package com.gamedistribution.gamedistribution.model;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.AllArgsConstructor;
+import lombok.*;
 import java.io.Serializable;
+import java.util.Objects;
 
-/**
- * Classe auxiliar para representar a chave primária composta da entidade ItemCompra.
- * É essencial para mapear o relacionamento N:N com atributos.
- */
 @Embeddable
-@Data
+@Getter
+@Setter
+@ToString
 @NoArgsConstructor
 @AllArgsConstructor
 public class ItemCompraId implements Serializable {
 
-    /**
-     * ID da Compra, parte da chave primária.
-     */
+    // Garante que o Hibernate leia/escreva na coluna correta do banco
+    @Column(name = "id_compra")
     private Long idCompra;
 
-    /**
-     * ID do Jogo, parte da chave primária.
-     */
+    @Column(name = "id_jogo")
     private Long idJogo;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ItemCompraId that = (ItemCompraId) o;
+        return Objects.equals(idCompra, that.idCompra) &&
+                Objects.equals(idJogo, that.idJogo);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(idCompra, idJogo);
+    }
 }

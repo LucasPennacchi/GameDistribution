@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerenciar Cliente - GameDistribution</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <script>
+        
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'accent-blue': '#6366f1', 
+                        'deep-bg': '#0f172a', 
+                        'card-bg': '#1e293b',
+                        'header-text': '#818cf8', 
+                        'accent-green': '#34d399',
+                        'accent-red': '#ef4444', 
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- CSS INTEGRADO: Tema Dark Indigo -->
+    <style>
+        :root {
+            --bg-color: #0f172a; 
+            --text-color: #e2e8f0;
+            --card-bg: #1e293b;
+            --input-bg: #0f172a;
+            --border-color: #334155; 
+            --header-text: #818cf8; 
+        }
+        
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5); 
+        }
+
+        .input-field {
+            background-color: var(--input-bg);
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+        }
+    </style>
+</head>
+<body class="flex flex-col items-center">
+
+    <!-- Cabeçalho com Botão Voltar -->
+    <header class="card p-4 rounded-xl shadow-2xl mb-8 w-full max-w-4xl flex justify-between items-center">
+        <h1 id="form-title" class="text-2xl font-extrabold" style="color: var(--header-text);">
+            Gerenciar Cliente
+        </h1>
+        <!-- Botão VOLTAR (volta para a tela de login) -->
+        <a href="login.html" class="bg-gray-700 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded-lg shadow-md transition duration-300 flex items-center">
+            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+            </svg>
+            Voltar ao Login
+        </a>
+    </header>
+
+    <!-- Formulário Principal -->
+    <div class="card p-8 rounded-xl w-full max-w-lg">
+        <form id="cliente-form" onsubmit="handleFormSubmission(event)" class="space-y-6">
+
+         
+            <input type="hidden" id="cliente-id" name="id">
+
+            <div>
+                <label for="nome" class="block text-sm font-medium mb-2">Nome Completo</label>
+                <input 
+                    type="text" 
+                    id="nome" 
+                    name="nome" 
+                    required 
+                    class="input-field w-full p-3 rounded-lg focus:ring-accent-blue focus:border-accent-blue transition duration-150"
+                >
+            </div>
+
+            <div>
+                <label for="email" class="block text-sm font-medium mb-2">Email</label>
+                <input 
+                    type="email" 
+                    id="email" 
+                    name="email" 
+                    required 
+                    class="input-field w-full p-3 rounded-lg focus:ring-accent-blue focus:border-accent-blue transition duration-150"
+                >
+            </div>
+
+            <div>
+                <label for="dataNascimento" class="block text-sm font-medium mb-2">Data de Nascimento</label>
+                <input 
+                    type="date" 
+                    id="dataNascimento" 
+                    name="dataNascimento" 
+                    required 
+                    class="input-field w-full p-3 rounded-lg focus:ring-accent-blue focus:border-accent-blue transition duration-150"
+                >
+            </div>
+            
+            <!-- Mensagem de Status -->
+            <p id="status-message" class="text-center text-sm font-medium min-h-6"></p>
+
+            <button 
+                type="submit" 
+                id="submit-button"
+                class="w-full bg-accent-blue hover:opacity-90 text-white font-bold py-3 px-4 rounded-lg shadow-lg transition duration-300 transform hover:scale-[1.01]"
+            >
+                Salvar Cliente
+            </button>
+        </form>
+    </div>
+
+    <!-- JavaScript Integrado para a Lógica do Formulário -->
+    <script>
+        const API_BASE_URL = 'http://localhost:8080/api'; 
+        
+        const urlParams = new URLSearchParams(window.location.search);
+        const clienteId = urlParams.get('id');
+        const formTitle = document.getElementById('form-title');
+        const submitButton = document.getElementById('submit-button');
+        const statusMessage = document.getElementById('status-message');
+
+        /**
+         * Converte uma data para o formato YYYY-MM-DD.
+         */
+        function formatDate(dateString) {
+            if (!dateString) return '';
+            if (dateString.includes('T')) {
+                return dateString.split('T')[0];
+            }
+            return dateString; 
+        }
+
+        /**
+         * Busca os dados do cliente se o ID estiver na URL (modo Edição).
+         */
+        async function carregarClienteParaEdicao() {
+            if (!clienteId) {
+                // Modo Cadastro - Não há ID
+                formTitle.textContent = 'Novo Cliente';
+                submitButton.textContent = 'Cadastrar Cliente';
+                return;
+            }
+
+            // Modo Edição - ID existe
+            formTitle.textContent = `Editar Cliente (ID: ${clienteId})`;
+            submitButton.textContent = 'Atualizar Cliente';
+
+            try {
+                // Simula a busca de dados
+                const response = await fetch(`${API_BASE_URL}/clientes/${clienteId}`);
+                if (!response.ok) throw new Error(`Status ${response.status}: Cliente não encontrado.`);
+                
+                const cliente = await response.json();
+                
+                // Preenche o formulário
+                document.getElementById('cliente-id').value = cliente.id;
+                document.getElementById('nome').value = cliente.nome;
+                document.getElementById('email').value = cliente.email;
+                document.getElementById('dataNascimento').value = formatDate(cliente.dataNascimento);
+
+                statusMessage.textContent = 'Dados carregados com sucesso.';
+                statusMessage.classList.add('text-accent-green');
+
+            } catch (error) {
+                statusMessage.textContent = `Erro ao carregar cliente: ${error.message}.`;
+                statusMessage.classList.add('text-accent-red');
+                console.error('Erro ao buscar cliente:', error);
+            }
+        }
+
+        /**
+         * Lida com o envio do formulário (POST para Cadastro, PUT para Atualização).
+         */
+        async function handleFormSubmission(event) {
+            event.preventDefault(); 
+            
+            statusMessage.textContent = '';
+            statusMessage.className = 'text-center text-sm font-medium min-h-6';
+            
+            const formData = {
+                nome: document.getElementById('nome').value,
+                email: document.getElementById('email').value,
+                dataNascimento: document.getElementById('dataNascimento').value
+            };
+            
+            const isUpdate = !!document.getElementById('cliente-id').value; 
+            const url = isUpdate ? `${API_BASE_URL}/clientes/${document.getElementById('cliente-id').value}` : `${API_BASE_URL}/clientes`;
+            const method = isUpdate ? 'PUT' : 'POST';
+
+            submitButton.textContent = isUpdate ? 'Atualizando...' : 'Cadastrando...';
+            submitButton.disabled = true;
+
+            try {
+                const response = await fetch(url, {
+                    method: method,
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(formData)
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    const errorMsg = data.message || `Erro de API ao ${isUpdate ? 'atualizar' : 'cadastrar'}.`;
+                    throw new Error(errorMsg);
+                }
+
+                statusMessage.textContent = `Cliente ${isUpdate ? 'atualizado' : 'cadastrado'} com sucesso! ID: ${data.id}`;
+                statusMessage.classList.remove('text-accent-red');
+                statusMessage.classList.add('text-accent-green');
+                
+                
+                if (!isUpdate) {
+                    // SE FOR UM NOVO CADASTRO, REDIRECIONA PARA A TELA DE LOGIN
+                    setTimeout(() => {
+                        window.location.href = 'login.html'; 
+                    }, 2000); 
+                }
+
+            } catch (error) {
+                statusMessage.textContent = `ERRO: ${error.message}`;
+                statusMessage.classList.remove('text-accent-green');
+                statusMessage.classList.add('text-accent-red');
+                console.error('Erro de submissão:', error);
+            } finally {
+               
+                if (isUpdate) {
+                    submitButton.textContent = 'Atualizar Cliente';
+                    submitButton.disabled = false;
+                }
+            }
+        }
+
+        window.onload = carregarClienteParaEdicao;
+    </script>
+</body>
+</html>

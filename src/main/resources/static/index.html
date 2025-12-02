@@ -2,79 +2,250 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <title>GameDistribution - Dashboard de Consultas</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GameDistribution - Consultas</title>
+    <!-- Carregamento do Tailwind CSS para estilização moderna e responsiva -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <script>
+        // Configuração de cores customizadas
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        // Cores de ênfase (vibrantes)
+                        'accent-blue': '#6366f1', /* Indigo-500 */
+                        'accent-green': '#34d399', /* Emerald-400 */
+                        'deep-bg': '#0f172a', /* Fundo Preto Azulado */
+                        'card-bg': '#1e293b', /* Fundo do Card (Slate-800) */
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- CSS INTEGRADO: Tema Dark Fixo (Preto Azulado) -->
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 20px; background-color: #f4f4f9; }
-        header { background-color: #333; color: white; padding: 15px; text-align: center; margin-bottom: 20px; }
-        h2 { border-bottom: 2px solid #007bff; color: #007bff; padding-bottom: 5px; margin-top: 30px; }
-        table { width: 100%; border-collapse: collapse; margin-bottom: 30px; background-color: white; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-        th, td { border: 1px solid #ddd; padding: 10px; text-align: left; }
-        th { background-color: #e9ecef; }
-        .filter-container { background-color: #fff; padding: 15px; border-radius: 8px; margin-bottom: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
-        .result-box { background-color: #e9f7ef; border: 1px solid #28a745; padding: 15px; border-radius: 5px; margin-top: 15px; }
-        .error-message { color: red; }
+        /* Variáveis de Tema Fixo (Deep Indigo) */
+        :root {
+            --bg-color: #0f172a; /* Deep Indigo - Fundo Principal */
+            --text-color: #e2e8f0; /* Texto Claro (Slate-200) */
+            --card-bg: #1e293b; /* Fundo dos Cards (Slate-800) */
+            --border-color: #334155; /* Divisores e bordas (Slate-700) */
+            --header-text: #818cf8; /* Cor Vibrante para Títulos (Indigo-400) */
+            --sub-text: #94a3b8; /* Subtítulos/texto secundário (Slate-400) */
+        }
+        
+        /* Aplicação das variáveis no body e nos cards */
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .card {
+            background-color: var(--card-bg);
+            color: var(--text-color);
+            border: 1px solid var(--border-color);
+            transition: background-color 0.3s, color 0.3s;
+        }
+        
+        .sub-border {
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        /* Estilos de cabeçalho e corpo da tabela */
+        .table-header th {
+            background-color: var(--border-color);
+            color: var(--text-color);
+        }
+
+        .table-row-bg {
+            background-color: var(--card-bg);
+            color: var(--text-color);
+        }
+        
+        /* Input Field customizado */
+        .input-field {
+            background-color: var(--bg-color);
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+        }
+        
+        /* Garantir que as linhas da tabela usem o fundo do tema */
+        #tabela-jogos tbody tr, #tabela-historico tbody tr, #tabela-clientes tbody tr, #tabela-editoras tbody tr, #tabela-publicadoras tbody tr {
+            background-color: var(--card-bg);
+        }
+        #tabela-jogos tbody td, #tabela-historico tbody td, #tabela-clientes tbody td, #tabela-editoras tbody td, #tabela-publicadoras tbody td {
+            border-bottom: 1px solid var(--border-color);
+        }
     </style>
 </head>
-<body>
-<header>
-    <h1>🎮 GameDistribution API - Consultas (Etapa 4/5)</h1>
-</header>
+<body class="min-h-screen p-4 sm:p-8">
 
-<div id="jogos-section">
-    <h2>🔥 Catálogo de Jogos & Consultas Agregadas</h2>
-    <div class="filter-container">
-        <label>Consulta de Catálogo:</label>
-        <select id="consulta-jogos" onchange="carregarJogos()">
-            <option value="todos">Listar Todos os Jogos (Padrão)</option>
-            <option value="mais_vendidos">Top 5 Jogos Mais Vendidos (Consulta Complexa)</option>
-        </select>
+    <!-- Cabeçalho Principal -->
+    <header class="card p-6 rounded-xl shadow-2xl mb-8 flex justify-between items-center">
+        <div class="flex-1">
+            <h1 class="text-3xl font-extrabold" style="color: var(--header-text);">
+                🎮 GameDistribution - Consultas
+            </h1>
+            <p style="color: var(--sub-text);" class="mt-1">Ferramenta de Consultas Complexas (Spring Boot & MySQL)</p>
+        </div>
+        
+        <!-- Grupo de Botões (Gerenciar Clientes e Sair) -->
+        <div class="flex space-x-3">
 
-        <label for="filtro-categoria" style="margin-left: 20px;">Filtrar por Gênero:</label>
-        <select id="filtro-categoria" onchange="carregarJogos()">
-        </select>
+            <!-- Botão de Sair (Logout) -->
+            <button 
+                onclick="fazerLogout()" 
+                class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-lg shadow-md transition duration-300 transform hover:scale-105 flex items-center"
+            >
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+                </svg>
+                Sair
+            </button>
+        </div>
+    </header>
+
+    <!-- Seção de Consultas de Jogos (Filtros e Resultados) -->
+    <div id="jogos-section" class="card p-6 rounded-xl shadow-xl mb-8">
+        <h2 class="text-2xl font-semibold mb-4 sub-border pb-2" style="color: var(--header-text);">
+            🛒 Catálogo de Jogos (Consulta com Filtros e Ordenação)
+        </h2>
+
+        <div class="filter-container space-y-4 md:space-y-0 md:flex md:space-x-4 mb-6">
+            <div class="flex-1">
+                <label for="genero-select" class="block text-sm font-medium" style="color: var(--text-color);">Filtrar por Gênero:</label>
+                <select id="genero-select" class="w-full p-2 rounded-lg input-field focus:ring-accent-blue focus:border-accent-blue transition duration-150">
+                    <option value="">Todos os Gêneros</option>
+                </select>
+            </div>
+            
+            <div class="flex-1">
+                <label for="ordenacao-select" class="block text-sm font-medium" style="color: var(--text-color);">Ordenar por:</label>
+                <select id="ordenacao-select" class="w-full p-2 rounded-lg input-field focus:ring-accent-blue focus:border-accent-blue transition duration-150">
+                    <option value="precoAsc">Preço (Crescente)</option>
+                    <option value="precoDesc">Preço (Decrescente)</option>
+                    <option value="lancamentoDesc">Data Lançamento (Recente)</option>
+                </select>
+            </div>
+
+            <div class="md:self-end">
+                <button onclick="carregarJogos()" class="w-full md:w-auto bg-accent-blue hover:opacity-90 text-white font-bold py-2 px-4 rounded-lg shadow-md transition duration-300 transform hover:scale-105">
+                    Aplicar Filtros
+                </button>
+            </div>
+        </div>
+
+        <!-- Tabela de Jogos -->
+        <div class="overflow-x-auto">
+            <table id="tabela-jogos" class="min-w-full divide-y" style="border-color: var(--border-color);">
+                <thead class="table-header">
+                <tr>
+                    <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider rounded-tl-lg">ID</th>
+                    <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider">Título</th>
+                    <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider">Preço</th>
+                    <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider">Lançamento</th>
+                    <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider">Editora</th>
+                    <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider rounded-tr-lg">Gênero</th>
+                </tr>
+                </thead>
+                <tbody class="divide-y" style="border-color: var(--border-color);">
+                </tbody>
+            </table>
+        </div>
     </div>
-    <table id="tabela-jogos">
-        <thead>
-        <tr>
-            <th>ID</th><th>Título</th><th>Preço</th><th>Lançamento</th><th>Editora</th><th>Gênero</th>
-        </tr>
-        </thead>
-        <tbody></tbody>
-    </table>
-</div>
 
-<div id="historico-section">
-    <h2>🧾 Histórico de Compras por Cliente (Consulta Complexa)</h2>
-    <div class="filter-container">
-        <label for="cliente-id-input">ID do Cliente (Ex: 1 a 10):</label>
-        <input type="number" id="cliente-id-input" value="1" min="1" max="10">
-        <button onclick="buscarHistorico()">Buscar Histórico</button>
-        <p id="historico-status" class="error-message"></p>
+    <!-- Seção de Histórico de Compras -->
+    <div id="historico-section" class="card p-6 rounded-xl shadow-xl mb-8">
+        <h2 class="text-2xl font-semibold mb-4 sub-border pb-2" style="color: var(--header-text);">
+            🧾 Histórico de Compras por Cliente (Consulta Complexa)
+        </h2>
+        <div class="filter-container flex flex-col sm:flex-row items-start sm:items-center space-y-3 sm:space-y-0 sm:space-x-4 mb-4">
+            <label for="cliente-id-input" class="text-sm font-medium whitespace-nowrap" style="color: var(--text-color);">ID do Cliente (Ex: 1 a 10):</label>
+            <input type="number" id="cliente-id-input" value="1" min="1" max="10" class="p-2 rounded-lg input-field w-full sm:w-24 focus:ring-accent-blue focus:border-accent-blue transition duration-150">
+            <button onclick="buscarHistorico()" class="bg-accent-green hover:opacity-90 text-white font-bold py-2 px-4 rounded-lg shadow-md transition duration-300 transform hover:scale-105 w-full sm:w-auto">
+                Buscar Histórico
+            </button>
+            <p id="historico-status" class="text-red-400 text-sm mt-2 sm:mt-0"></p>
+        </div>
+        
+        <!-- Tabela Histórico -->
+        <div id="historico-resultado" class="mt-4 overflow-x-auto">
+            <table id="tabela-historico" class="min-w-full divide-y" style="border-color: var(--border-color);">
+                <thead class="table-header">
+                <tr>
+                    <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider rounded-tl-lg">ID Compra</th>
+                    <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider">Data</th>
+                    <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider">Jogo Comprado</th>
+                    <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider">Preço Pago</th>
+                </tr>
+                </thead>
+                <tbody class="divide-y" style="border-color: var(--border-color);">
+                </tbody>
+            </table>
+        </div>
     </div>
-    <div id="historico-resultado" style="margin-top: 15px;">
-        <table id="tabela-historico">
-            <thead>
-            <tr>
-                <th>ID Compra</th>
-                <th>Data</th>
-                <th>Jogo Comprado</th>
-                <th>Preço Pago</th>
-            </tr>
-            </thead>
-            <tbody></tbody>
-        </table>
+    
+    <!-- Seções de Visualização Básica -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        
+        <!-- Clientes -->
+        <div class="card p-6 rounded-xl shadow-xl">
+            <h2 class="text-xl font-semibold mb-4 sub-border pb-2" style="color: var(--header-text);">👤 Clientes Cadastrados</h2>
+            <div class="overflow-x-auto">
+                <table id="tabela-clientes" class="min-w-full divide-y" style="border-color: var(--border-color);">
+                    <thead class="table-header">
+                        <tr>
+                            <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider rounded-tl-lg">ID</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider">Nome</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider">Email</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider rounded-tr-lg">Nascimento</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y" style="border-color: var(--border-color);"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Editoras -->
+        <div class="card p-6 rounded-xl shadow-xl">
+            <h2 class="text-xl font-semibold mb-4 sub-border pb-2" style="color: var(--header-text);">📝 Editoras (Criadoras)</h2>
+            <div class="overflow-x-auto">
+                <table id="tabela-editoras" class="min-w-full divide-y" style="border-color: var(--border-color);">
+                    <thead class="table-header">
+                        <tr>
+                            <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider rounded-tl-lg">ID</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider">Nome</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider rounded-tr-lg">Sede</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y" style="border-color: var(--border-color);"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Publicadoras -->
+        <div class="card p-6 rounded-xl shadow-xl">
+            <h2 class="text-xl font-semibold mb-4 sub-border pb-2" style="color: var(--header-text);">📣 Publicadoras (Divulgadoras)</h2>
+            <div class="overflow-x-auto">
+                <table id="tabela-publicadoras" class="min-w-full divide-y" style="border-color: var(--border-color);">
+                    <thead class="table-header">
+                        <tr>
+                            <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider rounded-tl-lg">ID</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider">Nome</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider rounded-tr-lg">Email</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y" style="border-color: var(--border-color);"></tbody>
+                </table>
+            </div>
+        </div>
     </div>
-</div>
-
-<h2>👤 Clientes Cadastrados</h2>
-<table id="tabela-clientes"><thead><tr><th>ID</th><th>Nome</th><th>Email</th><th>Nascimento</th></tr></thead><tbody></tbody></table>
-
-<h2>📝 Editoras (Criadoras)</h2>
-<table id="tabela-editoras"><thead><tr><th>ID</th><th>Nome</th><th>Sede</th></tr></thead><tbody></tbody></table>
-
-<h2>📣 Publicadoras (Divulgadoras)</h2>
-<table id="tabela-publicadoras"><thead><tr><th>ID</th><th>Nome</th><th>Email</th></tr></thead><tbody></tbody></table>
-
-<script src="app.js"></script>
+    
+    <!-- Script da Aplicação -->
+    <!-- Mantido como 'script.js' conforme sua estrutura original -->
+    <script src="script.js"></script>
 </body>
 </html>

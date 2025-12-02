@@ -1,11 +1,14 @@
 package com.gamedistribution.gamedistribution.model;
 
 import jakarta.persistence.*;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
-import java.time.LocalDate;
+import lombok.EqualsAndHashCode;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import java.time.LocalDate;
 
 /**
  * Representa a entidade JOGO_PUBLICADORA no banco de dados.
@@ -13,39 +16,41 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
  */
 @Entity
 @Table(name = "JOGO_PUBLICADORA")
-@Data
+@Getter
+@Setter
+@ToString(callSuper = false)
 @NoArgsConstructor
 @AllArgsConstructor
 public class JogoPublicadora {
 
     /**
-     * Chave primária composta.
+     * Chave primária composta (ID embutido).
      */
     @EmbeddedId
     private JogoPublicadoraId id = new JogoPublicadoraId();
 
     /**
-     * Relacionamento M:1 com Jogo. Mapeado pelo 'idJogo' na chave composta.
-     * @JsonIgnore garante que esta referência não inicie um ciclo Jogo -> Publicadora -> JogoPublicadora -> Jogo.
+     * Relacionamento M:1 com Jogo.
+     * @MapsId("idJogo") diz ao Hibernate: "Use o valor em 'id.idJogo' para esta chave estrangeira".
+     * @JoinColumn força o nome da coluna física para 'id_jogo', garantindo que bata com o banco.
      */
     @ManyToOne
     @MapsId("idJogo")
     @JoinColumn(name = "id_jogo", nullable = false)
-    @JsonIgnore // Essencial para quebrar o ciclo
+    @JsonIgnore // Evita ciclo Jogo -> Publicacoes -> Jogo
+    @EqualsAndHashCode.Exclude
     private Jogo jogo;
 
     /**
-     * Relacionamento M:1 com Publicadora. Mapeado pelo 'idPublicadora' na chave composta.
-     * Queremos ver qual publicadora está sendo referenciada, então mantemos este campo.
+     * Relacionamento M:1 com Publicadora.
+     * @MapsId("idPublicadora") usa o valor em 'id.idPublicadora'.
      */
     @ManyToOne
     @MapsId("idPublicadora")
     @JoinColumn(name = "id_publicadora", nullable = false)
+    @EqualsAndHashCode.Exclude // Evita ciclo Publicadora -> Publicacoes -> Publicadora
     private Publicadora publicadora;
 
-    /**
-     * Data de início da campanha de divulgação pela publicadora.
-     */
     @Column(name = "data_inicio_divulgacao", nullable = false)
     private LocalDate dataInicioDivulgacao;
 }

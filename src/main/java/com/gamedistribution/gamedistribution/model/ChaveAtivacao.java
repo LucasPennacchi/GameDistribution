@@ -1,9 +1,12 @@
 package com.gamedistribution.gamedistribution.model;
 
 import jakarta.persistence.*;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.time.LocalDateTime;
 
 /**
@@ -12,7 +15,9 @@ import java.time.LocalDateTime;
  */
 @Entity
 @Table(name = "CHAVE_ATIVACAO")
-@Data
+@Getter
+@Setter
+@ToString(callSuper = false)
 @NoArgsConstructor
 @AllArgsConstructor
 public class ChaveAtivacao {
@@ -45,8 +50,10 @@ public class ChaveAtivacao {
     /**
      * Relacionamento N:1 com a entidade Jogo.
      * Mapeia a chave estrangeira 'id_jogo'.
+     * @JsonIgnore é opcional aqui, mas ajuda a evitar ciclos.
      */
     @ManyToOne
     @JoinColumn(name = "id_jogo", nullable = false)
+    @JsonIgnore
     private Jogo jogo;
 }

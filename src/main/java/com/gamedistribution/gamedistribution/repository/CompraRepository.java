@@ -26,6 +26,19 @@ public interface CompraRepository extends JpaRepository<Compra, Long> {
      * @param clienteId O ID do cliente.
      * @return Uma lista de objetos Compra.
      */
-    @Query("SELECT c FROM Compra c LEFT JOIN FETCH c.itensDaCompra ic LEFT JOIN FETCH ic.jogo j WHERE c.cliente.id = :clienteId ORDER BY c.dataCompra DESC")
+    @Query("SELECT DISTINCT c FROM Compra c LEFT JOIN FETCH c.itensDaCompra ic LEFT JOIN FETCH ic.jogo j WHERE c.cliente.id = :clienteId ORDER BY c.dataCompra DESC")
     List<Compra> findHistoricoDetalhadoByClienteId(@Param("clienteId") Long clienteId);
+
+
+    // ----------------------------------------------------------------------------------
+    // MÉTODO AUXILIAR: Busca por ID do Cliente (Para listar no Service)
+    // ----------------------------------------------------------------------------------
+
+    /**
+     * Busca todas as compras feitas por um cliente específico, utilizando o ID do Cliente.
+     * Esta é uma convenção padrão do Spring Data JPA: findBy[Nome do Campo Relacionado]Id.
+     * @param clienteId O ID do cliente.
+     * @return Uma lista de compras.
+     */
+    List<Compra> findByClienteId(Long clienteId);
 }
